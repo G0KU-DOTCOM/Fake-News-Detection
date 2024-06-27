@@ -7,3 +7,6 @@ from sklearn.svm import LinearSVC
 
 data = pd.read_csv('fake_or_real_news.csv')
 
+data["fake"] = data["label"].apply(lambda x: 0 if x == "REAL" else 1)
+data = data.drop("label", axis=1)
+print(data.head())
