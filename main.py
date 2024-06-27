@@ -14,11 +14,34 @@ data = data.drop("label", axis=1)
 x, y = data['text'], data['fake']
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
-len(x_train), len(x_test)
+#len(x_train), len(x_test)
 
 vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
 x_train_vectorized = vectorizer.fit_transform(x_train)
 x_test_vectorized = vectorizer.transform(x_test)
 
+clf = LinearSVC()
+clf.fit(x_train_vectorized, y_train)
 
+clf.score(x_test_vectorized, y_test)
+
+print(clf.score(x_test_vectorized, y_test))
+
+articles_predicted_correctly = len(y_test) * clf.score(x_test_vectorized, y_test)
+
+print(f"There were {articles_predicted_correctly} articles predicted correctly out of {len(y_test)} articles")
+
+
+
+## If you want to add an article:
+
+with open ("mytext.txt", "w", encoding="utf-8") as f:
+    f.write(x_test.iloc[10]) #you can add any article you want to test
+
+with open ("mytext.txt", "r", encoding="utf-8") as f:
+    article = f.read()
+
+vectorized_text = vectorizer.transform([article])
+
+clf.predict(vectorized_text)
 
