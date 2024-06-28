@@ -6,7 +6,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer #representign the ar
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
-from googletrans import Translator
+from sklearn.model_selection import GridSearchCV
+#from googletrans import Translator
 
 data = pd.read_csv('fake_or_real_news.csv')
 
@@ -21,14 +22,29 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 
 pipeline = Pipeline([
 ('vectorizer', TfidfVectorizer(stop_words='english', max_df=0.7)),
-    ('clf', LinearSVC())
+    ('classifier', LinearSVC())
 ])
 
 param_grid = {
-    'vectorizer_max_df': [0.7, 0.9, 1.0],
-    'clf_C': [0.1, 1, 10, 100, 1000]
+    'vectorizer__max_df': [0.5, 0.7, 0.9],
+    'classifier__C': [0.1, 1, 10]
 }
 
+grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='accuracy')
+grid_search.fit(x_train, y_train)
+
+best_model = grid_search.best_estimator_
+
+y_pred = best_model.predict(x_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"Accuracy: {accuracy}:.4f")
+
+articles_predicted_correctly = int(len(y_test)) * accuracy
+
+
+
+"""
 vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
 x_train_vectorized = vectorizer.fit_transform(x_train)
 x_test_vectorized = vectorizer.transform(x_test)
@@ -58,3 +74,4 @@ vectorized_text = vectorizer.transform([article])
 
 clf.predict(vectorized_text)
 
+"""
