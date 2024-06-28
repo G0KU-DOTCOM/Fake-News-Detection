@@ -38,9 +38,11 @@ best_model = grid_search.best_estimator_
 y_pred = best_model.predict(x_test)
 accuracy = accuracy_score(y_test, y_pred)
 
-print(f"Accuracy: {accuracy}:.4f")
+print(f"Accuracy: {accuracy:.4f}")
 
 articles_predicted_correctly = int(len(y_test)) * accuracy
+
+print(f"There were {articles_predicted_correctly} articles predicted correctly out of {len(y_test)} articles")
 
 
 
