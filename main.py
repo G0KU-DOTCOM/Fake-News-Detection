@@ -7,7 +7,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
-#from googletrans import Translator
+from googletrans import Translator
 
 data = pd.read_csv('fake_or_real_news.csv')
 
@@ -44,36 +44,26 @@ articles_predicted_correctly = int(len(y_test)) * accuracy
 
 print(f"There were {articles_predicted_correctly} articles predicted correctly out of {len(y_test)} articles")
 
+def predict_article(article, model, target_language = 'en'):
+    translator = Translator()
+    translated_article = translator.translate(article, dest=target_language).text
+    vectorized_text = model.named_steps['vectorizer'].transform([translated_article])
+    prediction = model.named_steps['classifier'].predict(vectorized_text)
+    return "REAL" if prediction == 0 else "FAKE"
 
-
-"""
-vectorizer = TfidfVectorizer(stop_words='english', max_df=0.7)
-x_train_vectorized = vectorizer.fit_transform(x_train)
-x_test_vectorized = vectorizer.transform(x_test)
-
-clf = LinearSVC()
-clf.fit(x_train_vectorized, y_train)
-
-clf.score(x_test_vectorized, y_test)
-
-print(clf.score(x_test_vectorized, y_test))
-
-articles_predicted_correctly = len(y_test) * clf.score(x_test_vectorized, y_test)
-
-print(f"There were {articles_predicted_correctly} articles predicted correctly out of {len(y_test)} articles")
-
+test_article = x_test.iloc[10]
+prediction = predict_article(test_article, best_model)
+print(f"Prediction: {prediction}")
 
 
 ## If you want to add an article:
 
 with open ("mytext.txt", "w", encoding="utf-8") as f:
-    f.write(x_test.iloc[10]) #you can add any article you want to test
+    f.write(test_article) #you can add any article you want to test
 
 with open ("mytext.txt", "r", encoding="utf-8") as f:
     article = f.read()
 
-vectorized_text = vectorizer.transform([article])
+custom_prediction = predict_article(test_article, best_model)
+print(f"Prediction for the custom article: {custom_prediction}")
 
-clf.predict(vectorized_text)
-
-"""
